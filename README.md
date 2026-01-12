@@ -1,5 +1,5 @@
 # GUIAlignFusion: Progressive Gated Alignment-Fusion Network for GUI Retrieval
-![Alt text](https://github.com/fangyanjia1999/GUIAlignFusion/blob/main/Display/overall.PNG)
+![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/overall.png)
 
 *Figure 1: Overview of our approach: including the creation of the datasets, vision-language model training, and development of the GUI search engine.*
 
@@ -14,16 +14,16 @@ Comprehensive automated and human evaluations demonstrate that our method signif
 Our approach consists of two main stages:
 
 ### Stage 1: Feature Alignment Enhancement
-![Alt text](https://github.com/fangyanjia1999/-GUIAlignFusion/blob/main/Display/stage1.png)
+![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/stage.png)
 *Figure 2: In the first stage of training, we perform task-oriented fine-tuning of CLIP encoders to reduce the mismatch between large-scale pretraining and the downstream task.*
 
 We freeze the CLIP encoders and only train the novel Attention Guided Gated Fusion (AGGF) module. After 30% of the training, we progressively unfreeze the vision encoder layers in an architecture-aware order to adapt the unified embedding space for downstream GUI retrieval.
 
 ### Stage 2: Feature Fusion Generation
-![Alt text](https://github.com/fangyanjia1999/-GUIAlignFusion/blob/main/Display/stage2.png)
+![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/stage2.png)
 *Figure 3: In the second stage of training, we train from scratch a MFEDFR-Combiner network that learns to fuse the multimodal features extracted with CLIP encoders.*
 
-![Alt text](https://github.com/fangyanjia1999/-GUIAlignFusion/blob/main/Display/Model2.png)
+![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/model.png)
 *Figure 4: MFEDFR-Combiner serves as the main network in the second stage for enhanced feature fusion. Starting from its baseline architecture (a), it is upgraded to version (b) by incorporating a Multiscale Fusion and Dynamic Fusion module.*
 
 ## Dataset Construction
