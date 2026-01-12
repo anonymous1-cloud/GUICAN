@@ -6,7 +6,8 @@
 ## Introduction
 In today's era of widespread mobile applications, GUI retrieval is a critical technology for AI-assisted design and development. It significantly boosts efficiency, impacting both user satisfaction and team productivity. However, traditional learning-based methods face bottlenecks, including high sensitivity to image quality, difficulties in achieving fine-grained visual-language alignment, and a reliance on precise keyword matching.
 
-To address these issues, we propose **GUIAlignFusion**, a novel two-stage vision-language search engine for mobile GUI retrieval. Our method employs a progressive unfreezing strategy and an AGGF module to fine-tune the CLIP model with a ranking loss for joint visual-textual encoding to locate target GUIs. It introduces an MFEDFR-Combiner module that enhances cross-modal representations using attention mechanisms and residual gating, then dynamically fuses them into a unified vector mapped to target interfaces.
+To address the aforementioned challenges, this paper attempts to propose the GUICAN method, which aims to adaptlarge-scale vision-language models to the GUI retrieval task,
+exploring a pathway to narrow the gap between general pre-training and downstream applications. As illustrated inFigure 1, the overall approach utilizes a self-constructed GUI Layout Differences Description Dataset (GL3D) and adopts a novel two-stage pipeline. This pipeline integrates task oriented fine-tuning with a specially designed feature fusion network to facilitate the integration of multimodal information. Preliminary experiments conducted on the established GUI benchmark show that the method has yielded promising results in retrieval performance, with improvements observed in both accuracy and relevance. These findings offerinitial empirical support for the exploratory pathway described above.
 
 Comprehensive automated and human evaluations demonstrate that our method significantly outperforms baseline models, achieving 69% higher Recall@10, 93% higher Recall@50, and a 37% improvement in MRR.
 
@@ -21,10 +22,10 @@ We freeze the CLIP encoders and only train the novel Attention Guided Gated Fusi
 
 ### Stage 2: Feature Fusion Generation
 ![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/stage2.png)
-*Figure 3: In the second stage of training, we train from scratch a MFEDFR-Combiner network that learns to fuse the multimodal features extracted with CLIP encoders.*
+*Figure 3: In the second stage of training, we train from scratch a MEDR-Combiner network that learns to fuse the multimodal features extracted with CLIP encoders.*
 
 ![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/model.png)
-*Figure 4: MFEDFR-Combiner serves as the main network in the second stage for enhanced feature fusion. Starting from its baseline architecture (a), it is upgraded to version (b) by incorporating a Multiscale Fusion and Dynamic Fusion module.*
+*Figure 4: MEDR-Combiner is the key in the second stage. The left-hand structure is designed in the original Combiner, by incorporating multiscale and dynamic fusion modules, it is upgraded to the enhanced version shown on the right..*
 
 ## Dataset Construction
 We automatically construct a large-scale dataset, GUI Layout Differences Description Dataset.(the GL3D:**[`Download`](https://drive.google.com/drive/folders/1SUR1Tzp0BixmFNH4YIjJNgNId8IoarMf?usp=drive_link)**, containing 62,530 triplets for composed GUI retrieval. It is constructed from RICO(**[`Rico dataset`](http://interactionmining.org/rico)**) and RICO-Topic by leveraging computer vision techniques for component matching and GPT models for generating natural language edit instructions.
@@ -92,8 +93,7 @@ Blind assessments from six independent groups showed our method significantly ou
 Mann-Whitney U tests confirm statistically significant improvements across all metrics.
 
 ## Conclusion
-This work introduces GUIAlignFusion, a progressive fine-tuning strategy for GUI retrieval. The method begins by freezing the CLIP backbone to train only an attention-gated fusion module for rapid feature adaptation. It then progressively unfreezes vision encoder layers following an architecture-aware sequence, balancing stability with pretrained knowledge utilization. A dedicated Combiner network subsequently refines and fuses multimodal features, effectively bridging the domain gap between general pretraining and GUI-specific tasks while improving joint embedding additivity.
-
-Evaluations on our self-constructed dataset demonstrate superior performance over strong baselines, with visualizations validating the efficacy of the tuning and fusion mechanisms.
+This paper presents GUICAN, a progressive, task-oriented fine-tuning strategy for GUI retrieval designed to fully leverage CLIP’s pretrained knowledge. The process consists of two core stages. First, in the Feature Alignment Enhancement Stage, solely a newly introduced attention-gated fusion module is trained for the first 30% of iterations, with the remainder of CLIPfrozen, ensuring stable and rapid adaptation. Then, in the Feature Fusion Generation Stage, vision encoderlayers are progressively unfrozen in an architecture-adaptive order, which mitigates training instability and gradually activates the model’s stored knowledge. Ultimately, a specialized Combiner network refines and fuses the multimodal features to narrow the domain gap and improve the expressiveness of the joint embedding space. Evaluated on our self-built GL3D
+dataset, GUICAN shows substantial gains over strong baselines. Qualitative analyses further reveal how our fine-tuning and fusion approach enhances retrieval.
 
 
