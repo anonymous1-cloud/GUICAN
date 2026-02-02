@@ -88,4 +88,3 @@ We constructed GL3D using a hybrid pipeline involving OpenCV and GPT-2.
 # Example: How to run training (if you have code)
 python train.py --dataset gl3d --epochs 50
 
-
