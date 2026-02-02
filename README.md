@@ -92,8 +92,5 @@ Blind assessments from six independent groups showed our method significantly ou
 ![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/table3.png)
 Mann-Whitney U tests confirm statistically significant improvements across all metrics.
 
-## Conclusion
-This paper presents GUICAN, a progressive, task-oriented fine-tuning strategy for GUI retrieval designed to fully leverage CLIP’s pretrained knowledge. The process consists of two core stages. First, in the Feature Alignment Enhancement Stage, solely a newly introduced attention-gated fusion module is trained for the first 30% of iterations, with the remainder of CLIPfrozen, ensuring stable and rapid adaptation. Then, in the Feature Fusion Generation Stage, vision encoderlayers are progressively unfrozen in an architecture-adaptive order, which mitigates training instability and gradually activates the model’s stored knowledge. Ultimately, a specialized Combiner network refines and fuses the multimodal features to narrow the domain gap and improve the expressiveness of the joint embedding space. Evaluated on our self-built GL3D
-dataset, GUICAN shows substantial gains over strong baselines. Qualitative analyses further reveal how our fine-tuning and fusion approach enhances retrieval.
 
 
