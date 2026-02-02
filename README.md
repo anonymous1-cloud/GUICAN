@@ -1,96 +1,91 @@
-# GUICAN: ADeepGUICross-Modal Alignment Network for Multimodal Retrieval Based on CLIP
-![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/overall.jpg)
+# GUICAN: Deep GUI Cross-Modal Alignment Network
 
-*Figure 1: Overview of our approach: including the creation of the datasets, vision-language model training, and development of the GUI search engine.*
+![Overview](https://github.com/SnapUI1/GUIAlignFusion/blob/main/overall.jpg)
 
-## Introduction
-In today's era of widespread mobile applications, GUI retrieval is a critical technology for AI-assisted design and development. It significantly boosts efficiency, impacting both user satisfaction and team productivity. However, traditional learning-based methods face bottlenecks, including high sensitivity to image quality, difficulties in achieving fine-grained visual-language alignment, and a reliance on precise keyword matching.
+> **A Novel Approach for Multimodal GUI Retrieval Based on CLIP** > 📝 [Paper](你的论文链接) | 💾 [Dataset](#resources) | 📦 [Pretrained Models](#resources)
 
-To address the aforementioned challenges, this paper attempts to propose the GUICAN method, which aims to adaptlarge-scale vision-language models to the GUI retrieval task,
-exploring a pathway to narrow the gap between general pre-training and downstream applications. As illustrated inFigure 1, the overall approach utilizes a self-constructed GUI Layout Differences Description Dataset (GL3D) and adopts a novel two-stage pipeline. This pipeline integrates task oriented fine-tuning with a specially designed feature fusion network to facilitate the integration of multimodal information. Preliminary experiments conducted on the established GUI benchmark show that the method has yielded promising results in retrieval performance, with improvements observed in both accuracy and relevance. These findings offerinitial empirical support for the exploratory pathway described above.
+## 📖 Introduction
+GUICAN addresses the challenges in GUI retrieval (high sensitivity to image quality, fine-grained alignment issues) by adapting large-scale vision-language models to downstream tasks. 
 
-Comprehensive automated and human evaluations demonstrate that our method significantly outperforms baseline models, achieving 69% higher Recall@10, 93% higher Recall@50, and a 37% improvement in MRR.
+**Core Contributions:**
+- **SemAlign-GUI Framework:** A novel two-stage pipeline incorporating Task-Oriented Fine-Tuning and Attention-Guided Gated Fusion.
+- **SOTA Performance:** Achieves **69% higher Recall@10** and **37% improvement in MRR** compared to baselines.
+- **Large-Scale Dataset:** We introduce **GL3D**, containing 62,530 triplets for composed GUI retrieval.
 
-## Method Overview
-Our approach consists of two main stages:
+---
 
-### Stage 1: Feature Alignment Enhancement
-![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/stage.jpg)
-*Figure 2: In the first stage of training, we perform task-oriented fine-tuning of CLIP encoders to reduce the mismatch between large-scale pretraining and the downstream task.*
+## 🛠️ Method Overview
 
-We freeze the CLIP encoders and only train the novel Attention Guided Gated Fusion (AGGF) module. After 30% of the training, we progressively unfreeze the vision encoder layers in an architecture-aware order to adapt the unified embedding space for downstream GUI retrieval.
+Our approach consists of two main stages to bridge the gap between general pre-training and GUI tasks.
 
-### Stage 2: Feature Fusion Generation
-![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/stage2.jpg)
-*Figure 3: In the second stage of training, we train from scratch a MEDR-Combiner network that learns to fuse the multimodal features extracted with CLIP encoders.*
+### Stage 1: Feature Alignment
+We freeze CLIP encoders and train the **AGGF module**.
+<details>
+<summary><b>Click to view Stage 1 Architecture (Figure 2)</b></summary>
 
-![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/model.jpg)
-*Figure 4: MEDR-Combiner is the key in the second stage. The left-hand structure is designed in the original Combiner, by incorporating multiscale and dynamic fusion modules, it is upgraded to the enhanced version shown on the right..*
+![Stage 1](https://github.com/SnapUI1/GUIAlignFusion/blob/main/stage.jpg)
+*Figure 2: Task-oriented fine-tuning with progressive unfreezing strategy.*
+</details>
 
-## Dataset Construction
-We automatically construct a large-scale dataset, GUI Layout Differences Description Dataset.(the GL3D:**[`Download`](https://drive.google.com/drive/folders/1SUR1Tzp0BixmFNH4YIjJNgNId8IoarMf?usp=drive_link)**, containing 62,530 triplets for composed GUI retrieval. It is constructed from RICO(**[`Rico dataset`](http://interactionmining.org/rico)**) and RICO-Topic by leveraging computer vision techniques for component matching and GPT models for generating natural language edit instructions.
+### Stage 2: Feature Fusion
+We train the **MEDR-Combiner network** from scratch to fuse multimodal features.
+<details>
+<summary><b>Click to view Stage 2 & Model Architecture (Figure 3 & 4)</b></summary>
 
-### Rico-Topic Dataset
-We transformed the original RICO dataset into the Rico-Topic dataset by consolidating categories and applying automated prefiltering and manual annotation, ultimately curating 5,562 high-quality screenshots across 10 mutually exclusive themes.(the Rico-Topic Dataset: **[`Download`](https://drive.google.com/file/d/11TPlera7HjaF4O_8s0dd8OPgvfd0AeWh/view?usp=sharing)**)
+| Stage 2 Pipeline | MEDR-Combiner Structure |
+| :---: | :---: |
+| ![Stage 2](https://github.com/SnapUI1/GUIAlignFusion/blob/main/stage2.jpg) | ![Model](https://github.com/SnapUI1/GUIAlignFusion/blob/main/model.jpg) |
 
-### GUI Layout Differences Description Dataset
-For triplet generation, we implemented an automated pipeline:
-- GUI elements extracted via HSV conversion and contour detection using OpenCV
+</details>
 
-First, the system detects UI components through color features. It uses a predefined mapping table of BGR colors to component types (e.g., green for TextView, red for ImageView) and converts them to the HSV color space to improve detection stability. The detection process includes color thresholding, morphological operations (opening and closing) to enhance mask quality, and contour analysis. Each detected component records its position, dimensions, area, and type weight (components with higher weights, such as ImageView and EditText, are more important in change evaluation).
-- Mechanical descriptions refined into natural language using GPT-2
+---
 
-Second, the system employs a hybrid approach to generate UI descriptions. It first generates a basic description based on rules, including component statistics (e.g., "There are 2 TextViews and 1 Button") and detailed information about important instances (position and dimensions). Subsequently, the GPT-2 model (deployed on GPU) is used to refine the basic description, producing a more natural English description. GPT-2 performs conditional generation through prompt engineering (e.g., "Describe the user interface with these components:...") and employs temperature sampling (temperature=0.7) and repetition penalty (repetition_penalty=1.1) to balance creativity and consistency.
-- Component differences matched via Euclidean distance
+## 💾 Resources (Datasets & Checkpoints)
 
-Next, the system parses the description text and compares the two UI versions. During parsing, regular expressions are used to extract component types, positions, and dimensions, and statistical information is processed to fill in missing instances. The comparison algorithm includes multiple levels: type-level existence checks (adding or removing entire types), changes in instance counts, and detailed matching between instances (based on position and size similarity). Both position distance and size similarity are normalized to accommodate different resolutions.
+We release all datasets and pre-trained weights for reproducibility.
 
-Finally, the system calculates the significance score of changes and filters the most important ones. The score is based on component weight, relative area (proportion of screen area), movement distance, or degree of size change, ensuring that changes to important components (e.g., Button) receive higher scores. Only the top three changes are retained, and a concise English description is generated (e.g., "Button moved from (100,200) to (150,250); Added TextView at (300,400)"). The entire process uses JSON files as input and output units, includes a backup mechanism to ensure error recovery, and supports batch processing of various interface types (e.g., login pages, settings pages). This system is suitable for scenarios such as UI test automation, accessibility assistance, or design iteration analysis.This process produced structured triplets, each comprising a reference image, a difference description, and a target image.
+| Resource Name | Description | Download Link |
+| :--- | :--- | :---: |
+| **GL3D Dataset** | 62,530 triplets (Ref, Text, Target) for composed retrieval. | [**[`Google Drive`]**](https://drive.google.com/drive/folders/1SUR1Tzp0BixmFNH4YIjJNgNId8IoarMf?usp=drive_link) |
+| **Rico-Topic** | 5,562 curated screenshots across 10 themes. | [**[`Google Drive`]**](https://drive.google.com/file/d/11TPlera7HjaF4O_8s0dd8OPgvfd0AeWh/view?usp=sharing) |
+| **Model Weights** | Pre-trained GUIAlignFusion weights. | [**[`Google Drive`]**](https://drive.google.com/file/d/1u43DZe968v9Fs9xMvUbUnn4jQbkAM-uZ/view?usp=drive_link) |
 
-## Implementation Details
-We conduct all experiments on a single Tesla V100-SXM2-32GB GPU. Our CLIP-based cross-modal GUI retrieval system with a focus on three aspects: multistage training, dynamic optimization, and advanced fusion. Our setup is evaluated on a newly constructed dataset of 5,559 GUI triplets derived from RICO.
+### 🔍 Dataset Construction Details
+We constructed GL3D using a hybrid pipeline involving OpenCV and GPT-2. 
 
-### Model Implementation
-- AdamW optimizer with hierarchical learning rates (3e-5 for fusion modules, 3e-6 for CLIP parameters)
-- Input GUI images resized to 288×288 pixels
-- CLIP-encoded into 640-dimensional feature vectors
-- Mixed precision computing and gradient clipping with max norm of 1.0
-- Enhanced margin-based ranking loss with margin of 0.2
+<details>
+<summary><b>Click to expand detailed construction pipeline (HSV, GPT-2, etc.)</b></summary>
 
-### Pre-trained Model Weights
-To facilitate reproducibility and further research, we release the pre-trained weights of our GUIAlignFusion model. These weights can be used for inference on your own data or as a starting point for continued fine-tuning.(the GUIAlignFusion Model Weights: **[`Download`](https://drive.google.com/file/d/1u43DZe968v9Fs9xMvUbUnn4jQbkAM-uZ/view?usp=drive_link)**)
+#### 1. GUI Element Extraction
+- Used HSV conversion and contour detection via OpenCV.
+- Mapped BGR colors to component types (e.g., Green -> TextView).
+- Detection includes thresholding, morphological operations, and contour analysis.
 
+#### 2. Natural Language Description (GPT-2)
+- Employed a hybrid rule-based + GPT-2 approach.
+- GPT-2 refined mechanical stats into natural English (Temp=0.7, Repetition Penalty=1.1).
 
-## Results
-### Automated Evaluation
-We conducted a systematic evaluation comparing our cross-modal GUI retrieval system against three baseline methods:
-1. Vision-only CNN UI Autoencoder
-2. Shallow fusion GUing model
-3. Fixed fusion Combiner
+#### 3. Difference Matching
+- Calculated Euclidean distance for component differences.
+- Filtered top-3 significant changes based on weight and area.
 
-![Alt text](https://github.com/fangyanjia1999/-GUIAlignFusion/blob/main/Display/login.jpg)
-![Alt text](https://github.com/fangyanjia1999/-GUIAlignFusion/blob/main/Display/setting.jpg)
-*Figure 5: Top-5 retrieved Target images on (a) Login; (b) Settings.*
+</details>
 
-![Alt text](https://github.com/fangyanjia1999/-GUIAlignFusion/blob/main/Display/relevance.jpg)  
-![Alt text](https://github.com/fangyanjia1999/-GUIAlignFusion/blob/main/Display/diversity.jpg)
-*Figure 6: Top-5 Visual Examples Demonstrating Retrieval on (a) relevance; (b) diversity.*
+---
 
-Our method consistently outperforms all baselines across all metrics:
-![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/table1.png)
+## 💻 Implementation & Usage
 
-### Ablation Study
-We conducted a systematic ablation study on the three core modules of our MFEDFR-Combiner:
+### Prerequisites
+- Single Tesla V100-SXM2-32GB GPU (Recommended)
+- Python 3.x / PyTorch (Add your versions here)
 
-![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/table2.png)
-### User Evaluation
-Blind assessments from six independent groups showed our method significantly outperformed all baseline models across three metrics:
-- Relevance: 3.77 (37% improvement)
-- Diversity: 4.10 (29% improvement)
-- Usefulness: 3.55 (22% improvement)
+### Key Parameters
+- **Optimizer:** AdamW (lr=3e-5 for fusion, 3e-6 for CLIP)
+- **Input Size:** 288×288 pixels
+- **Batch Size:** (Add your batch size)
 
-![Alt text](https://github.com/SnapUI1/GUIAlignFusion/blob/main/table3.png)
-Mann-Whitney U tests confirm statistically significant improvements across all metrics.
-
+```bash
+# Example: How to run training (if you have code)
+python train.py --dataset gl3d --epochs 50
 
 
